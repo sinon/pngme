@@ -1,6 +1,5 @@
 use crate::chunk_type::ChunkType;
 use crc::{Crc, CRC_32_ISO_HDLC};
-// use nom::AsBytes;
 use std::fmt;
 
 pub type Error = Box<dyn std::error::Error>;
