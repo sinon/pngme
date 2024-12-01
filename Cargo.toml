@@ -4,4 +4,6 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+anyhow = "1.0.93"
 crc = "3.2.1"
+nom = "7.1.3"

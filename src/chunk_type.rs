@@ -1,5 +1,7 @@
-use std::fmt::{Display, Result};
+use std::fmt;
 use std::str::{from_utf8, FromStr};
+
+use anyhow::{bail, Error, Result};
 
 /// A validated PNG chunk type. See the PNG spec for more details.
 /// http://www.libpng.org/pub/png/spec/1.2/PNG-Structure.html
@@ -54,12 +56,12 @@ impl ChunkType {
 }
 
 impl TryFrom<[u8; 4]> for ChunkType {
-    type Error = &'static str;
+    type Error = Error;
 
-    fn try_from(value: [u8; 4]) -> std::result::Result<ChunkType, &'static str> {
+    fn try_from(value: [u8; 4]) -> Result<ChunkType> {
         for v in value {
             if !v.is_ascii() {
-                return Err("The supplied value contains non-ascii values");
+                bail!("The supplied value contains non-ascii values");
             }
         }
         let ct = ChunkType { data: value };
@@ -67,20 +69,17 @@ impl TryFrom<[u8; 4]> for ChunkType {
     }
 }
 
-#[derive(Debug, PartialEq, Eq)]
-pub struct ChunkTypeParseError;
 impl FromStr for ChunkType {
-    type Err = ChunkTypeParseError;
-
-    fn from_str(s: &str) -> std::result::Result<ChunkType, ChunkTypeParseError> {
+    type Err = Error;
+    fn from_str(s: &str) -> Result<ChunkType> {
         if s.len() != 4 {
-            return Err(ChunkTypeParseError);
+            bail!("wrong length");
         }
         if !s.is_ascii() {
-            return Err(ChunkTypeParseError);
+            bail!("not ascii");
         }
         if !s.chars().all(|x| x.is_alphabetic()) {
-            return Err(ChunkTypeParseError);
+            bail!("No alpha");
         }
 
         let bytes = s.as_bytes();
@@ -91,8 +90,8 @@ impl FromStr for ChunkType {
     }
 }
 
-impl Display for ChunkType {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result {
+impl fmt::Display for ChunkType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}", from_utf8(&self.data).unwrap())
     }
 }
