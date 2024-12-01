@@ -2,21 +2,20 @@ use crate::chunk_type::ChunkType;
 use crc::{Crc, CRC_32_ISO_HDLC};
 use std::fmt;
 
-pub type Error = Box<dyn std::error::Error>;
-pub type Result<T> = std::result::Result<T, Error>;
+use anyhow::{bail, Error, Result};
 
 pub const CASTAGNOLI: Crc<u32> = Crc::<u32>::new(&CRC_32_ISO_HDLC);
 
 /// A validated PNG chunk. See the PNG Spec for more details
 /// http://www.libpng.org/pub/png/spec/1.2/PNG-Structure.html
 #[derive(Debug, Clone)]
-struct Chunk {
+pub struct Chunk {
     data: Vec<u8>,
     chunk_type: ChunkType,
 }
 
 impl Chunk {
-    fn new(chunk_type: ChunkType, data: Vec<u8>) -> Self {
+    pub fn new(chunk_type: ChunkType, data: Vec<u8>) -> Self {
         Chunk { chunk_type, data }
     }
     /// The length of the data portion of this chunk.
@@ -51,7 +50,7 @@ impl Chunk {
     /// 4. The CRC of the chunk type and data *(4 bytes)*
     pub fn as_bytes(&self) -> Vec<u8> {
         let crc = self.crc();
-        let length = self.data.len();
+        let length = self.data.len() as u32;
         length
             .to_be_bytes()
             .iter()
@@ -81,21 +80,25 @@ fn read_be_u32(input: &mut &[u8]) -> u32 {
 }
 
 impl TryFrom<&[u8]> for Chunk {
-    type Error = &'static str;
+    type Error = Error;
 
-    fn try_from(mut value: &[u8]) -> std::result::Result<Chunk, &'static str> {
+    fn try_from(mut value: &[u8]) -> Result<Chunk> {
         let length = read_be_u32(&mut value);
-
+        dbg!(length);
         let (chunk_type_data, value) = value.split_at(std::mem::size_of::<[u8; 4]>());
         let mut ct_array: [u8; 4] = [0; 4];
         ct_array.clone_from_slice(chunk_type_data);
+
         let chunk_type = ChunkType::try_from(ct_array)?;
+        dbg!(&chunk_type);
+        // dbg!(&value);
+        dbg!(value.len());
         let (chunk_data, mut value) = value.split_at(length as usize);
         let data: Vec<u8> = chunk_data.into();
         let crc = read_be_u32(&mut value);
         let c = Chunk::new(chunk_type, data);
         if crc != c.crc() {
-            return Err("Invalid CRC");
+            bail!("Invalid CRC");
         }
         Ok(c)
     }
