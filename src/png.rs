@@ -1,5 +1,4 @@
 use std::fmt;
-use std::io::Read;
 
 use crate::{chunk::Chunk, chunk_type::ChunkType};
 
@@ -42,7 +41,7 @@ impl Png {
         }
         if let (Some(i), Some(c)) = (chunk_idx, chunk_match) {
             self.chunks.remove(i);
-            return Ok(c);
+            Ok(c)
         } else {
             bail!("Not found");
         }
@@ -58,18 +57,14 @@ impl Png {
     /// Searches for a `Chunk` with the specified `chunk_type` and returns the first
     /// matching `Chunk` from this `Png`.
     pub fn chunk_by_type(&self, chunk_type: &str) -> Option<&Chunk> {
-        for c in self.chunks().iter() {
-            if c.chunk_type().to_string() == chunk_type {
-                return Some(c);
-            }
-        }
-        None
+        self.chunks()
+            .iter()
+            .find(|&c| c.chunk_type().to_string() == chunk_type)
     }
     /// Returns this `Png` as a byte sequence.
     /// These bytes will contain the header followed by the bytes of all of the chunks.
     pub fn as_bytes(&self) -> Vec<u8> {
         let mut bytes: Vec<u8> = Png::STANDARD_HEADER.into();
-
         for chunk in &self.chunks {
             let mut cb = chunk.as_bytes();
             bytes.append(&mut cb);
@@ -90,7 +85,7 @@ fn parse_chunk(input: &[u8]) -> IResult<&[u8], Chunk> {
     // data of length
     let (input, data) = take(length as usize)(input)?;
     // crc: 4 bytes
-    let (input, crc) = take(4usize)(input)?;
+    let (input, _) = take(4usize)(input)?;
     let chunk_type_array = [
         chunk_type_raw[0],
         chunk_type_raw[1],
@@ -104,8 +99,6 @@ fn parse_chunk(input: &[u8]) -> IResult<&[u8], Chunk> {
 
 fn parse_png(input: &[u8]) -> IResult<&[u8], Png> {
     let (input, header) = take(8usize)(input)?;
-    dbg!(header);
-    dbg!(Png::STANDARD_HEADER);
     if header != Png::STANDARD_HEADER {
         return Err(nom::Err::Error(nom::error::Error {
             code: ErrorKind::TakeTill1,
@@ -119,8 +112,11 @@ fn parse_png(input: &[u8]) -> IResult<&[u8], Png> {
 impl TryFrom<&[u8]> for Png {
     type Error = Error;
     fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        let (_, png) = parse_png(&bytes).unwrap();
-        Ok(png)
+        let result = parse_png(bytes);
+        match result {
+            Ok((_, png)) => Ok(png),
+            Err(_) => bail!("Parsing error"),
+        }
     }
 }
 

@@ -174,11 +174,9 @@ mod tests {
     #[test]
     pub fn test_invalid_chunk_is_valid() {
         let chunk = ChunkType::from_str("Rust").unwrap();
-        dbg!(&chunk);
         assert!(!chunk.is_valid());
 
         let chunk = ChunkType::from_str("Ru1t");
-        dbg!(&chunk);
         assert!(chunk.is_err());
     }
 
