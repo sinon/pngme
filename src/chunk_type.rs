@@ -1,7 +1,7 @@
 use std::fmt;
-use std::str::{FromStr, from_utf8};
+use std::str::{from_utf8, FromStr};
 
-use anyhow::{Error, Result, bail};
+use anyhow::{bail, Error, Result};
 
 /// A validated PNG chunk type. See the PNG spec for more details.
 /// http://www.libpng.org/pub/png/spec/1.2/PNG-Structure.html

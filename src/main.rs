@@ -1,7 +1,7 @@
 use anyhow::Result;
 use std::path::PathBuf;
 
-use clap::{Parser, Subcommand, command};
+use clap::{command, Parser, Subcommand};
 
 use pngme_lib::{decode, encode, print_chunks, remove};
 

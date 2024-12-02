@@ -2,7 +2,7 @@ use std::fmt;
 
 use crate::{chunk::Chunk, chunk_type::ChunkType};
 
-use anyhow::{Error, Result, bail};
+use anyhow::{bail, Error, Result};
 
 /// A PNG container as described by the PNG spec
 /// http://www.libpng.org/pub/png/spec/1.2/PNG-Contents.html
@@ -71,7 +71,7 @@ impl Png {
 }
 
 use nom::{
-    IResult, bytes::complete::take, error::ErrorKind, multi::many0, number::complete::be_i32,
+    bytes::complete::take, error::ErrorKind, multi::many0, number::complete::be_i32, IResult,
 };
 fn parse_chunk(input: &[u8]) -> IResult<&[u8], Chunk> {
     //length

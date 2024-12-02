@@ -7,7 +7,7 @@ use std::io::{Read, Write};
 use std::path::PathBuf;
 use std::str::FromStr;
 
-use anyhow::{Error, Ok, Result, bail};
+use anyhow::{bail, Error, Ok, Result};
 
 fn open_png(path: &PathBuf) -> Result<png::Png> {
     let mut f = fs::File::open(path)?;
