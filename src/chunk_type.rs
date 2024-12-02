@@ -1,7 +1,7 @@
 use std::fmt;
-use std::str::{from_utf8, FromStr};
+use std::str::{FromStr, from_utf8};
 
-use anyhow::{bail, Error, Result};
+use anyhow::{Error, Result, bail};
 
 /// A validated PNG chunk type. See the PNG spec for more details.
 /// http://www.libpng.org/pub/png/spec/1.2/PNG-Structure.html
@@ -20,15 +20,17 @@ fn is_5th_bit_set(value: u8) -> bool {
 
 impl ChunkType {
     /// Returns the raw bytes contained in this chunk
+    #[allow(dead_code)]
     fn bytes(&self) -> [u8; 4] {
         self.data
     }
     // Returns true if the reserved byte is valid and all four bytes are represented by the characters A-Z or a-z.
     /// Note that this chunk type should always be valid as it is validated during construction.
-    fn is_valid(&self) -> bool {
+    pub fn is_valid(&self) -> bool {
         self.is_reserved_bit_valid()
     }
     /// Returns the property state of the first byte as described in the PNG spec
+    #[allow(dead_code)]
     fn is_critical(&self) -> bool {
         // Ancillary bit: bit 5 of first byte
         // 0 (uppercase) = critical, 1 (lowercase) = ancillary.
@@ -36,6 +38,7 @@ impl ChunkType {
         !is_5th_bit_set(self.data[0])
     }
     /// Returns the property state of the second byte as described in the PNG spec
+    #[allow(dead_code)]
     fn is_public(&self) -> bool {
         // Private bit: bit 5 of second byte
         // 0 (uppercase) = public, 1 (lowercase) = private.
@@ -48,6 +51,7 @@ impl ChunkType {
         !is_5th_bit_set(self.data[2])
     }
     /// Returns the property state of the fourth byte as described in the PNG spec
+    #[allow(dead_code)]
     fn is_safe_to_copy(&self) -> bool {
         // Safe-to-copy bit: bit 5 of fourth byte
         // 0 (uppercase) = unsafe to copy, 1 (lowercase) = safe to copy.

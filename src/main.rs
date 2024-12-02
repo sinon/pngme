@@ -1,13 +1,33 @@
-mod args;
-mod chunk;
-mod chunk_type;
-mod commands;
-mod png;
-
 use anyhow::Result;
-use args::{Cli, Commands};
-use clap::Parser;
-use commands::{decode, encode, print_chunks, remove};
+use std::path::PathBuf;
+
+use clap::{Parser, Subcommand, command};
+
+use pngme_lib::{decode, encode, print_chunks, remove};
+
+#[derive(Parser, Debug)]
+#[command(name = "pngme")]
+#[command(about = "Hide secret message in png files", long_about = None)]
+pub struct Cli {
+    #[command(subcommand)]
+    pub command: Commands,
+}
+
+#[derive(Debug, Subcommand)]
+pub enum Commands {
+    #[command(arg_required_else_help = true)]
+    Encode {
+        path: PathBuf,
+        chunk_type: String,
+        message: String,
+    },
+    #[command(arg_required_else_help = true)]
+    Decode { path: PathBuf, chunk_type: String },
+    #[command(arg_required_else_help = true)]
+    Remove { path: PathBuf, chunk_type: String },
+    #[command(arg_required_else_help = true)]
+    Print { path: PathBuf },
+}
 
 fn main() -> Result<()> {
     let args = Cli::parse();
