@@ -1,5 +1,6 @@
 # pngme
-https://jrdngr.github.io/pngme_book/
+
+Implementation of https://jrdngr.github.io/pngme_book/
 
 ## Build Instructions
 
