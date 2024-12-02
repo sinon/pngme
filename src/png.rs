@@ -7,7 +7,7 @@ use anyhow::{bail, Error, Result};
 /// A PNG container as described by the PNG spec
 /// http://www.libpng.org/pub/png/spec/1.2/PNG-Contents.html
 #[derive(Debug)]
-struct Png {
+pub struct Png {
     chunks: Vec<Chunk>,
 }
 
@@ -45,10 +45,6 @@ impl Png {
         } else {
             bail!("Not found");
         }
-    }
-    /// The header of this PNG.
-    pub fn header(&self) -> &[u8; 8] {
-        &Png::STANDARD_HEADER
     }
     /// Lists the `Chunk`s stored in this `Png`
     pub fn chunks(&self) -> &[Chunk] {
@@ -97,7 +93,7 @@ fn parse_chunk(input: &[u8]) -> IResult<&[u8], Chunk> {
     Ok((input, chunk))
 }
 
-fn parse_png(input: &[u8]) -> IResult<&[u8], Png> {
+pub fn parse_png(input: &[u8]) -> IResult<&[u8], Png> {
     let (input, header) = take(8usize)(input)?;
     if header != Png::STANDARD_HEADER {
         return Err(nom::Err::Error(nom::error::Error {
@@ -133,7 +129,6 @@ mod tests {
     use crate::chunk::Chunk;
     use crate::chunk_type::ChunkType;
     use std::convert::TryFrom;
-    use std::str::FromStr;
 
     fn testing_chunks() -> Vec<Chunk> {
         vec![
