@@ -1,4 +1,4 @@
-cargo-features = ["codegen-backend"]
+# cargo-features = ["codegen-backend"]
 
 [package]
 name = "pngme"
@@ -35,5 +35,5 @@ name = "pngme-gui"
 path = "src/gui/main.rs"
 required-features = ["build-gui"]
 
-[profile.dev]
-codegen-backend = "cranelift"
+# [profile.dev]
+# codegen-backend = "cranelift"
