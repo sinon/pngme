@@ -1,3 +1,12 @@
+#![warn(missing_docs)]
+//! Hide secret messages in PNG files
+//!
+//! Encode, decode, and remove secret messages from PNG files.
+//!
+//! Based on the [`pngme book`].
+//!
+//! [`pngme book`]: https://jrdngr.github.io/pngme_book/
+
 mod chunk;
 mod chunk_type;
 mod png;
@@ -19,6 +28,17 @@ fn open_png(path: &PathBuf) -> Result<png::Png> {
 }
 
 /// Encodes a message into a PNG file and saves the result
+///
+/// # Examples
+///
+/// ```
+/// use std::path::PathBuf;
+/// use pngme_lib::encode;
+/// let path = PathBuf::from("dice.png");
+/// let message = "This is a secret message".to_string();
+/// let chunk_type = "RuSt".to_string();
+/// encode(path, chunk_type, message).unwrap();
+/// ```
 pub fn encode(path: PathBuf, chunk_type: String, message: String) -> Result<()> {
     let mut png_file = open_png(&path)?;
     let chunk_type = chunk_type::ChunkType::from_str(&chunk_type)?;
@@ -38,19 +58,39 @@ fn write_png(path: PathBuf, png_file: png::Png) -> Result<(), Error> {
 }
 
 /// Searches for a message hidden in a PNG file and prints the message if one is found
-pub fn decode(path: PathBuf, chunk_type: String) -> Result<()> {
+///
+/// # Examples
+///
+/// ```
+/// use std::path::PathBuf;
+/// use pngme_lib::decode;
+/// let path = PathBuf::from("dice.png");
+/// let chunk_type = "RuSt".to_string();
+/// let msg = decode(path, chunk_type).unwrap();
+/// assert_eq!(msg, "This is a secret message");
+/// ```
+pub fn decode(path: PathBuf, chunk_type: String) -> Result<String> {
     let png_file = open_png(&path)?;
 
     let chunk = png_file.chunk_by_type(&chunk_type);
     if let Some(x) = chunk {
-        println!("{}", x.data_as_string()?);
+        Ok((x.data_as_string()?).to_string())
     } else {
-        println!("No secret message found");
+        Ok("No secret message found".to_string())
     }
-    Ok(())
 }
 
 /// Removes a chunk from a PNG file and saves the result
+///
+/// # Examples
+///
+/// ```
+/// use std::path::PathBuf;
+/// use pngme_lib::remove;
+/// let path = PathBuf::from("dice.png");
+/// let chunk_type = "RuSt".to_string();
+/// remove(path, chunk_type).unwrap();
+/// ```
 pub fn remove(path: PathBuf, chunk_type: String) -> Result<()> {
     let mut png_file = open_png(&path)?;
 
@@ -60,6 +100,15 @@ pub fn remove(path: PathBuf, chunk_type: String) -> Result<()> {
 }
 
 /// Prints all of the chunks in a PNG file
+///
+/// # Examples
+///
+/// ```
+/// use std::path::PathBuf;
+/// use pngme_lib::print_chunks;
+/// let path = PathBuf::from("dice.png");
+/// print_chunks(path).unwrap();
+/// ```
 pub fn print_chunks(path: PathBuf) -> Result<()> {
     let png_file = open_png(&path)?;
 
