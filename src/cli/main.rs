@@ -1,3 +1,4 @@
+#![warn(missing_docs)]
 use anyhow::Result;
 use std::path::PathBuf;
 
@@ -37,7 +38,10 @@ fn main() -> Result<()> {
             chunk_type,
             message,
         } => encode(path, chunk_type, message)?,
-        Commands::Decode { path, chunk_type } => decode(path, chunk_type)?,
+        Commands::Decode { path, chunk_type } => {
+            let msg = decode(path, chunk_type)?;
+            println!("{}", msg);
+        }
         Commands::Remove { path, chunk_type } => remove(path, chunk_type)?,
         Commands::Print { path } => print_chunks(path)?,
     }

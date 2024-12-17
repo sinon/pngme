@@ -1,6 +1,7 @@
 # pngme
 
-Implementation of https://jrdngr.github.io/pngme_book/
+Implementation of <https://jrdngr.github.io/pngme_book/>
+<https://jrdngr.github.io/pngme_book/>
 
 ## Build Instructions
 
@@ -12,11 +13,11 @@ Implementation of https://jrdngr.github.io/pngme_book/
 
 `cargo build --release`
 
-
 ## CLI Help output
 
 Hide secret message in png files
 
+```sh
 Usage: pngme <COMMAND>
 
 Commands:
@@ -28,7 +29,7 @@ Commands:
 
 Options:
   -h, --help  Print help
-
+```
 
 ### Sample commands with outputs
 

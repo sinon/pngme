@@ -5,7 +5,7 @@ use crate::{chunk::Chunk, chunk_type::ChunkType};
 use anyhow::{bail, Error, Result};
 
 /// A PNG container as described by the PNG spec
-/// http://www.libpng.org/pub/png/spec/1.2/PNG-Contents.html
+/// <http://www.libpng.org/pub/png/spec/1.2/PNG-Contents.html>
 #[derive(Debug)]
 pub struct Png {
     chunks: Vec<Chunk>,
@@ -43,7 +43,7 @@ impl Png {
             self.chunks.remove(i);
             Ok(c)
         } else {
-            bail!("Not found");
+            bail!("No message found for chunk type: {}", chunk_type);
         }
     }
     /// Lists the `Chunk`s stored in this `Png`

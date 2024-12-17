@@ -7,7 +7,7 @@ use anyhow::{bail, Error, Result};
 pub const CASTAGNOLI: Crc<u32> = Crc::<u32>::new(&CRC_32_ISO_HDLC);
 
 /// A validated PNG chunk. See the PNG Spec for more details
-/// http://www.libpng.org/pub/png/spec/1.2/PNG-Structure.html
+/// <http://www.libpng.org/pub/png/spec/1.2/PNG-Structure.html>
 #[derive(Debug, Clone)]
 pub struct Chunk {
     data: Vec<u8>,
