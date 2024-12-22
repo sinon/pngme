@@ -6,15 +6,15 @@ use snafu::prelude::*;
 #[derive(Debug, Snafu)]
 pub enum ChunkTypeError {
     #[snafu(display("non-ascii char: `{value}` supplied"))]
-    NonAsciiChar {
-        value: u8,
-    },
+    NonAsciiChar { value: u8 },
     #[snafu(display("non-ascii in: `{value}`"))]
-    NonAsciiStr {
-        value: String,
-    },
+    NonAsciiStr { value: String },
+    #[snafu(display("chunk type must be 4 bytes long"))]
     WrongLength,
+    #[snafu(display("chunk type must be alphabetic"))]
     NonAlpha,
+    #[snafu(display("reserved bit is invalid"))]
+    InvalidReservedBit,
 }
 
 /// A validated PNG chunk type. See the PNG spec for more details.
@@ -96,11 +96,11 @@ impl FromStr for ChunkType {
             }
         );
         ensure!(s.chars().all(|x| x.is_alphabetic()), NonAlphaSnafu);
-
         let bytes = s.as_bytes();
         let ct = ChunkType {
             data: [bytes[0], bytes[1], bytes[2], bytes[3]],
         };
+        ensure!(ct.is_valid(), InvalidReservedBitSnafu);
         Ok(ct)
     }
 }
@@ -164,8 +164,8 @@ mod tests {
 
     #[test]
     pub fn test_chunk_type_is_reserved_bit_invalid() {
-        let chunk = ChunkType::from_str("Rust").unwrap();
-        assert!(!chunk.is_reserved_bit_valid());
+        let result = ChunkType::from_str("Rust");
+        assert!(result.is_err());
     }
 
     #[test]
@@ -188,9 +188,8 @@ mod tests {
 
     #[test]
     pub fn test_invalid_chunk_is_valid() {
-        let chunk = ChunkType::from_str("Rust").unwrap();
-        assert!(!chunk.is_valid());
-
+        let result = ChunkType::from_str("Rust");
+        assert!(result.is_err());
         let chunk = ChunkType::from_str("Ru1t");
         assert!(chunk.is_err());
     }
