@@ -160,8 +160,7 @@ mod tests {
     fn test_chunk_string() {
         let chunk = testing_chunk();
         let chunk_string = chunk.data_as_string().unwrap();
-        let expected_chunk_string =
-            String::from("This is where your secret message will be!");
+        let expected_chunk_string = String::from("This is where your secret message will be!");
         assert_eq!(chunk_string, expected_chunk_string);
     }
 
@@ -190,8 +189,7 @@ mod tests {
         let chunk = Chunk::try_from(chunk_data.as_ref()).unwrap();
 
         let chunk_string = chunk.data_as_string().unwrap();
-        let expected_chunk_string =
-            String::from("This is where your secret message will be!");
+        let expected_chunk_string = String::from("This is where your secret message will be!");
 
         assert_eq!(chunk.length(), 42);
         assert_eq!(chunk.chunk_type().to_string(), String::from("RuSt"));

@@ -18,28 +18,41 @@ use std::str::FromStr;
 
 use snafu::prelude::*;
 
+/// Errors that can be returned by the library
 #[derive(Debug, Snafu)]
 pub enum Error {
+    /// Supplied file path does not exist
     #[snafu(display("File not found {path:?}"))]
     FileNotFound {
+        /// The source error
         source: std::io::Error,
+        /// The path that was not found
         path: PathBuf,
     },
+    /// Failed to read file
     #[snafu(display("Failed to read file"))]
     Read {
+        /// The source error
         source: std::io::Error,
     },
+    /// Failed to parse PNG file
     #[snafu(display("Error when parsing PNG"))]
     PNGParse,
+    /// Invalid chunk type suppied
     #[snafu(display("Supplied chunk type value: {chunk_type} is not valid"))]
     InvalidChunkType {
+        /// The chunk type that was invalid
         chunk_type: String,
     },
+    /// Failed to write changes to PNG file
     #[snafu(display("Error when writing PNG"))]
     PNGWrite {
+        /// The source error
         source: std::io::Error,
     },
+    /// No chunk was found for given `chunk_type`
     ChunkNotFound {
+        /// The chunk type that was not found
         chunk_type: String,
     },
 }
@@ -68,11 +81,10 @@ fn open_png(path: &PathBuf) -> Result<png::Png, Error> {
 pub fn encode(path: PathBuf, chunk_type: String, message: String) -> Result<(), Error> {
     let ct = chunk_type.clone();
     let mut png_file = open_png(&path)?;
-    let chunk_type = chunk_type::ChunkType::from_str(&chunk_type).map_err(|_| {
-        Error::InvalidChunkType {
+    let chunk_type =
+        chunk_type::ChunkType::from_str(&chunk_type).map_err(|_| Error::InvalidChunkType {
             chunk_type: ct.clone(),
-        }
-    })?;
+        })?;
 
     ensure!(
         chunk_type.is_valid(),
