@@ -4,7 +4,7 @@ use std::str::{from_utf8, FromStr};
 use anyhow::{bail, Error, Result};
 
 /// A validated PNG chunk type. See the PNG spec for more details.
-/// http://www.libpng.org/pub/png/spec/1.2/PNG-Structure.html
+/// <http://www.libpng.org/pub/png/spec/1.2/PNG-Structure.html>
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct ChunkType {
     data: [u8; 4],
