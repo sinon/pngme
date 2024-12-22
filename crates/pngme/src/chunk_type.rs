@@ -164,8 +164,8 @@ mod tests {
 
     #[test]
     pub fn test_chunk_type_is_reserved_bit_invalid() {
-        let chunk = ChunkType::from_str("Rust").unwrap();
-        assert!(!chunk.is_reserved_bit_valid());
+        let result = ChunkType::from_str("Rust");
+        assert!(result.is_err());
     }
 
     #[test]
@@ -188,9 +188,8 @@ mod tests {
 
     #[test]
     pub fn test_invalid_chunk_is_valid() {
-        let chunk = ChunkType::from_str("Rust").unwrap();
-        assert!(!chunk.is_valid());
-
+        let result = ChunkType::from_str("Rust");
+        assert!(result.is_err());
         let chunk = ChunkType::from_str("Ru1t");
         assert!(chunk.is_err());
     }
