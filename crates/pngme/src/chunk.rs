@@ -8,7 +8,10 @@ use snafu::prelude::*;
 pub enum ChunkError {
     #[snafu(display("Invalid CRC"))]
     InvalidCRC,
+    #[snafu(display("Invalid Chunk Type"))]
     InvalidChunkType,
+    #[snafu(display("Chunk data is not valid UTF-8"))]
+    UTF8Error,
 }
 pub const CASTAGNOLI: Crc<u32> = Crc::<u32>::new(&CRC_32_ISO_HDLC);
 
@@ -46,7 +49,7 @@ impl Chunk {
     /// Returns the data stored in this chunk as a `String`. This function will return an error
     /// if the stored data is not valid UTF-8.
     pub fn data_as_string(&self) -> Result<String, ChunkError> {
-        Ok(String::from_utf8(self.data.clone()).unwrap())
+        String::from_utf8(self.data.clone()).map_err(|_| ChunkError::UTF8Error)
     }
     /// Returns this chunk as a byte sequences described by the PNG spec.
     /// The following data is included in this byte sequence in order:

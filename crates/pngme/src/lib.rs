@@ -38,11 +38,16 @@ pub enum Error {
     /// Failed to parse PNG file
     #[snafu(display("Error when parsing PNG"))]
     PNGParse,
+    /// Failed to convert data to String
+    #[snafu(display("Error when converting PNG to String"))]
+    StrConversion,
     /// Invalid chunk type suppied
-    #[snafu(display("Supplied chunk type value: {chunk_type} is not valid"))]
+    #[snafu(display("Supplied chunk type value: `{chunk_type}` is not valid"))]
     InvalidChunkType {
         /// The chunk type that was invalid
         chunk_type: String,
+        /// The source error
+        source: chunk_type::ChunkTypeError,
     },
     /// Failed to write changes to PNG file
     #[snafu(display("Error when writing PNG"))]
@@ -62,7 +67,7 @@ fn open_png(path: &PathBuf) -> Result<png::Png, Error> {
     let mut data = vec![];
     f.read_to_end(&mut data).context(ReadSnafu)?;
     let (remaining, png_file) = png::parse_png(&data).unwrap();
-    ensure!(!remaining.is_empty(), PNGParseSnafu);
+    ensure!(remaining.is_empty(), PNGParseSnafu);
     Ok(png_file)
 }
 
@@ -82,14 +87,11 @@ pub fn encode(path: PathBuf, chunk_type: String, message: String) -> Result<(), 
     let ct = chunk_type.clone();
     let mut png_file = open_png(&path)?;
     let chunk_type =
-        chunk_type::ChunkType::from_str(&chunk_type).map_err(|_| Error::InvalidChunkType {
+        chunk_type::ChunkType::from_str(&chunk_type).map_err(|s| Error::InvalidChunkType {
             chunk_type: ct.clone(),
+            source: s,
         })?;
 
-    ensure!(
-        chunk_type.is_valid(),
-        InvalidChunkTypeSnafu { chunk_type: ct }
-    );
     let secret_chunk = chunk::Chunk::new(chunk_type, message.into());
     png_file.append_chunk(secret_chunk);
     write_png(path, png_file)?;
@@ -124,7 +126,7 @@ pub fn decode(path: PathBuf, chunk_type: String) -> Result<String, Error> {
 
     let chunk = png_file.chunk_by_type(&chunk_type);
     if let Some(x) = chunk {
-        Ok((x.data_as_string().map_err(|_| Error::PNGParse)?).to_string())
+        Ok((x.data_as_string().map_err(|_| Error::StrConversion)?).to_string())
     } else {
         Ok("No secret message found".to_string())
     }
