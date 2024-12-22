@@ -145,3 +145,4 @@ Error: Supplied chunk type value: rust is not valid
 - [ ] Update `lib` to use `snafu` / `thiserror`
 - [ ] Map custom errors to relevant Python errors
 - [ ] Add test workflow for python build
+- [ ] Fix coverage to include pytest coverage for `pngme-python`
