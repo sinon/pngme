@@ -1,4 +1,11 @@
 #![warn(missing_docs)]
+//! GUI using eframe for hiding secret messages in PNG files
+//!
+//! Encode, decode, and remove secret messages from PNG files.
+//!
+//! Based on the [`pngme book`].
+//!
+//! [`pngme book`]: https://jrdngr.github.io/pngme_book/
 use std::path::PathBuf;
 
 use eframe::egui;
@@ -56,12 +63,12 @@ impl eframe::App for PngmeApp {
                 ui.label("Options:");
                 ui.horizontal(|ui| {
                     if ui.button("Decode").clicked() {
-                        let path = PathBuf::from(format!("{}", picked_path));
+                        let path = PathBuf::from(picked_path.to_string());
                         self.decoded_message = Some(decode(path, "ruSt".to_string()).unwrap());
                     }
 
                     if ui.button("Remove").clicked() {
-                        let path = PathBuf::from(format!("{}", self.picked_path.as_ref().unwrap()));
+                        let path = PathBuf::from(self.picked_path.as_ref().unwrap().to_string());
                         let result = remove(path, "ruSt".to_string());
                         if let Err(e) = result {
                             self.error_message = Some(format!("Error: {}", e));
@@ -72,7 +79,7 @@ impl eframe::App for PngmeApp {
                 ui.horizontal(|ui| {
                     ui.text_edit_singleline(&mut self.secret_message);
                     if ui.button("Encode").clicked() {
-                        let path = PathBuf::from(format!("{}", self.picked_path.as_ref().unwrap()));
+                        let path = PathBuf::from(self.picked_path.as_ref().unwrap().to_string());
                         encode(path, "ruSt".to_string(), self.secret_message.to_string()).unwrap();
                     }
                 });
