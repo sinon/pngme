@@ -1,6 +1,6 @@
 # This is the main CI workflow that runs the test suite on all pushes to main and all pull requests.
 # It runs the following jobs:
-# - required: runs the test suite on ubuntu with stable and beta rust toolchains
+# - required: runs the test suite on ubuntu with nightly toolchain
 # - coverage: runs the test suite and collects coverage information
 # See check.yml for information about how the concurrency cancelation and workflow triggering works
 
@@ -19,15 +19,15 @@ env:
 jobs:
   required:
     runs-on: ubuntu-latest
-    name: ubuntu / stable
+    name: ubuntu / nightly
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: true
-      - name: Install stable
+      - name: Install nightly
         uses: dtolnay/rust-toolchain@master
         with:
-          toolchain: stable
+          toolchain: nightly
           components: llvm-tools-preview
       - name: cargo test --locked
         run: cargo test --locked --all-features --all-targets
