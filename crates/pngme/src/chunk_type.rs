@@ -1,7 +1,21 @@
 use std::fmt;
 use std::str::{from_utf8, FromStr};
 
-use anyhow::{bail, Error, Result};
+use snafu::prelude::*;
+
+#[derive(Debug, Snafu)]
+pub enum ChunkTypeError {
+    #[snafu(display("non-ascii char: `{value}` supplied"))]
+    NonAsciiChar {
+        value: u8,
+    },
+    #[snafu(display("non-ascii in: `{value}`"))]
+    NonAsciiStr {
+        value: String,
+    },
+    WrongLength,
+    NonAlpha,
+}
 
 /// A validated PNG chunk type. See the PNG spec for more details.
 /// <http://www.libpng.org/pub/png/spec/1.2/PNG-Structure.html>
@@ -60,13 +74,11 @@ impl ChunkType {
 }
 
 impl TryFrom<[u8; 4]> for ChunkType {
-    type Error = Error;
+    type Error = ChunkTypeError;
 
-    fn try_from(value: [u8; 4]) -> Result<ChunkType> {
+    fn try_from(value: [u8; 4]) -> Result<ChunkType, Self::Error> {
         for v in value {
-            if !v.is_ascii() {
-                bail!("The supplied value contains non-ascii values");
-            }
+            ensure!(v.is_ascii(), NonAsciiCharSnafu { value: v });
         }
         let ct = ChunkType { data: value };
         Ok(ct)
@@ -74,17 +86,16 @@ impl TryFrom<[u8; 4]> for ChunkType {
 }
 
 impl FromStr for ChunkType {
-    type Err = Error;
-    fn from_str(s: &str) -> Result<ChunkType> {
-        if s.len() != 4 {
-            bail!("wrong length");
-        }
-        if !s.is_ascii() {
-            bail!("not ascii");
-        }
-        if !s.chars().all(|x| x.is_alphabetic()) {
-            bail!("No alpha");
-        }
+    type Err = ChunkTypeError;
+    fn from_str(s: &str) -> Result<ChunkType, Self::Err> {
+        ensure!(s.len() == 4, WrongLengthSnafu);
+        ensure!(
+            s.is_ascii(),
+            NonAsciiStrSnafu {
+                value: s.to_string()
+            }
+        );
+        ensure!(s.chars().all(|x| x.is_alphabetic()), NonAlphaSnafu);
 
         let bytes = s.as_bytes();
         let ct = ChunkType {
