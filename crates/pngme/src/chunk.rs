@@ -2,8 +2,14 @@ use crate::chunk_type::ChunkType;
 use crc::{Crc, CRC_32_ISO_HDLC};
 use std::fmt;
 
-use anyhow::{bail, Error, Result};
+use snafu::prelude::*;
 
+#[derive(Debug, Snafu)]
+pub enum ChunkError {
+    #[snafu(display("Invalid CRC"))]
+    InvalidCRC,
+    InvalidChunkType,
+}
 pub const CASTAGNOLI: Crc<u32> = Crc::<u32>::new(&CRC_32_ISO_HDLC);
 
 /// A validated PNG chunk. See the PNG Spec for more details
@@ -39,7 +45,7 @@ impl Chunk {
     }
     /// Returns the data stored in this chunk as a `String`. This function will return an error
     /// if the stored data is not valid UTF-8.
-    pub fn data_as_string(&self) -> Result<String> {
+    pub fn data_as_string(&self) -> Result<String, ChunkError> {
         Ok(String::from_utf8(self.data.clone()).unwrap())
     }
     /// Returns this chunk as a byte sequences described by the PNG spec.
@@ -80,16 +86,17 @@ fn read_be_u32(input: &mut &[u8]) -> u32 {
 }
 
 impl TryFrom<&[u8]> for Chunk {
-    type Error = Error;
+    type Error = ChunkError;
 
-    fn try_from(mut value: &[u8]) -> Result<Chunk> {
+    fn try_from(mut value: &[u8]) -> Result<Chunk, Self::Error> {
         let length = read_be_u32(&mut value);
         dbg!(length);
         let (chunk_type_data, value) = value.split_at(std::mem::size_of::<[u8; 4]>());
         let mut ct_array: [u8; 4] = [0; 4];
         ct_array.clone_from_slice(chunk_type_data);
 
-        let chunk_type = ChunkType::try_from(ct_array)?;
+        let chunk_type =
+            ChunkType::try_from(ct_array).map_err(|_| Self::Error::InvalidChunkType)?;
         dbg!(&chunk_type);
         // dbg!(&value);
         dbg!(value.len());
@@ -97,9 +104,7 @@ impl TryFrom<&[u8]> for Chunk {
         let data: Vec<u8> = chunk_data.into();
         let crc = read_be_u32(&mut value);
         let c = Chunk::new(chunk_type, data);
-        if crc != c.crc() {
-            bail!("Invalid CRC");
-        }
+        ensure!(crc == c.crc(), InvalidCRCSnafu);
         Ok(c)
     }
 }
@@ -131,7 +136,9 @@ mod tests {
     #[test]
     fn test_new_chunk() {
         let chunk_type = ChunkType::from_str("RuSt").unwrap();
-        let data = "This is where your secret message will be!".as_bytes().to_vec();
+        let data = "This is where your secret message will be!"
+            .as_bytes()
+            .to_vec();
         let chunk = Chunk::new(chunk_type, data);
         assert_eq!(chunk.length(), 42);
         assert_eq!(chunk.crc(), 2882656334);
