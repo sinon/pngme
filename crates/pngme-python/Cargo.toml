@@ -1,0 +1,21 @@
+[package]
+name = "pngme-python"
+version = { workspace = true }
+edition = { workspace = true }
+authors = { workspace = true }
+license = { workspace = true }
+keywords = { workspace = true }
+homepage = { workspace = true }
+repository = { workspace = true }
+
+[dependencies]
+pyo3 = { workspace = true }
+pngme = { path = "../pngme" }
+
+[features]
+# make extensions visible to cargo vendor
+extension-module = ["pyo3/extension-module", "pyo3/generate-import-lib"]
+
+[lib]
+name = "pngme_python"
+crate-type = ["cdylib", "rlib"]

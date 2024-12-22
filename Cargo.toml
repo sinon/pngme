@@ -1,7 +1,12 @@
 # cargo-features = ["codegen-backend"]
 
 [workspace]
-members = ["crates/pngme", "crates/pngme-cli", "crates/pngme-gui"]
+members = [
+    "crates/pngme",
+    "crates/pngme-cli",
+    "crates/pngme-gui",
+    "crates/pngme-python",
+]
 resolver = "2"
 
 [workspace.package]
@@ -12,6 +17,10 @@ license = "MIT"
 keywords = ["rust", "png"]
 homepage = "https://github.com/sinon/pngme"
 repository = "https://github.com/sinon/pngme"
+
+[workspace.dependencies]
+pyo3 = { version = "0.23" }
+pyo3-build-config = { version = "0.23" }
 
 
 # [profile.dev]
