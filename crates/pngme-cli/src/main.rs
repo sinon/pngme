@@ -6,12 +6,11 @@
 //! Based on the [`pngme book`].
 //!
 //! [`pngme book`]: https://jrdngr.github.io/pngme_book/
-use anyhow::Result;
 use std::path::PathBuf;
 
 use clap::{command, Parser, Subcommand};
 
-use pngme_lib::{decode, encode, print_chunks, remove};
+use pngme_lib::{decode, encode, print_chunks, remove, Error};
 
 #[derive(Parser, Debug)]
 #[command(name = "pngme")]
@@ -37,7 +36,7 @@ enum Commands {
     Print { path: PathBuf },
 }
 
-fn main() -> Result<()> {
+fn main() -> Result<(), Error> {
     let args = Cli::parse();
     match args.command {
         Commands::Encode {
