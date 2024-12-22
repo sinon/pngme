@@ -1,0 +1,25 @@
+[package]
+name = "pngme-gui"
+readme = "../../README.md"
+version = { workspace = true }
+edition = { workspace = true }
+authors = { workspace = true }
+license = { workspace = true }
+keywords = { workspace = true }
+homepage = { workspace = true }
+repository = { workspace = true }
+
+
+[dependencies]
+pngme = { path = "../pngme" }
+eframe = { version = "0.30.0" }
+env_logger = { version = "0.10", default-features = false, features = [
+    "auto-color",
+    "humantime",
+] }
+rfd = { version = "0.15" }
+
+
+[[bin]]
+name = "pngme-gui"
+path = "src/main.rs"

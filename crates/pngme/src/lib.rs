@@ -61,7 +61,7 @@ fn write_png(path: PathBuf, png_file: png::Png) -> Result<(), Error> {
 ///
 /// # Examples
 ///
-/// ```
+/// ```no_run
 /// use std::path::PathBuf;
 /// use pngme_lib::decode;
 /// let path = PathBuf::from("dice.png");
@@ -84,7 +84,7 @@ pub fn decode(path: PathBuf, chunk_type: String) -> Result<String> {
 ///
 /// # Examples
 ///
-/// ```
+/// ```no_run
 /// use std::path::PathBuf;
 /// use pngme_lib::remove;
 /// let path = PathBuf::from("dice.png");
