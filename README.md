@@ -139,8 +139,3 @@ Chunk {
 ➜ cargo run encode dice.png rust "this is secret"
 Error: Supplied chunk type value: rust is not valid
 ```
-
-### TODO
-
-- [ ] Add test workflow for python build
-- [ ] Fix coverage to include pytest coverage for `pngme-python`
