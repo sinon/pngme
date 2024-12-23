@@ -20,5 +20,5 @@ python-dev-release:
 	maturin develop --uv -m crates/pngme-python/Cargo.toml --release
 
 python-test: python-dev
-    uv pip install pytest
+    uv pip install -r crates/pngme-python/tests/requirements.txt
     pytest crates/pngme-python/tests
