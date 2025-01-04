@@ -5,7 +5,7 @@ members = [
     "crates/pngme",
     "crates/pngme-cli",
     "crates/pngme-gui",
-    "crates/pngme-python",
+    "crates/pngme-python", "crates/pngme-www",
 ]
 resolver = "2"
 

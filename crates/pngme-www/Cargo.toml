@@ -1,0 +1,16 @@
+[package]
+name = "pngme-www"
+authors.workspace = true
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+keywords.workspace = true
+homepage.workspace = true
+repository.workspace = true
+
+[dependencies]
+maud = { version = "0.26.0", features = ["axum"] }
+serde = { version = "1.0.217", features = ["derive"] }
+tokio = { version = "1.42.0", features = ["full"] }
+axum = "0.8.1"
+pngme = { path = "../pngme" }
