@@ -80,15 +80,13 @@ fn open_png(path: &PathBuf) -> Result<png::Png, Error> {
 /// use pngme_lib::encode;
 /// let path = PathBuf::from("dice.png");
 /// let message = "This is a secret message".to_string();
-/// let chunk_type = "RuSt".to_string();
-/// encode(path, chunk_type, message).unwrap();
+/// encode(&path, "RuSt", message).unwrap();
 /// ```
-pub fn encode(path: PathBuf, chunk_type: String, message: String) -> Result<(), Error> {
-    let ct = chunk_type.clone();
-    let mut png_file = open_png(&path)?;
+pub fn encode(path: &PathBuf, chunk_type: &str, message: String) -> Result<(), Error> {
+    let mut png_file = open_png(path)?;
     let chunk_type =
-        chunk_type::ChunkType::from_str(&chunk_type).map_err(|s| Error::InvalidChunkType {
-            chunk_type: ct.clone(),
+        chunk_type::ChunkType::from_str(chunk_type).map_err(|s| Error::InvalidChunkType {
+            chunk_type: chunk_type.to_string(),
             source: s,
         })?;
 
@@ -98,11 +96,11 @@ pub fn encode(path: PathBuf, chunk_type: String, message: String) -> Result<(), 
     Ok(())
 }
 
-fn write_png(path: PathBuf, png_file: png::Png) -> Result<(), Error> {
+fn write_png(path: &PathBuf, png_file: png::Png) -> Result<(), Error> {
     let mut file = OpenOptions::new()
         .write(true)
         .truncate(true)
-        .open(&path)
+        .open(path)
         .context(FileNotFoundSnafu { path })?;
     file.write_all(&png_file.as_bytes())
         .context(PNGWriteSnafu)?;
@@ -117,14 +115,13 @@ fn write_png(path: PathBuf, png_file: png::Png) -> Result<(), Error> {
 /// use std::path::PathBuf;
 /// use pngme_lib::decode;
 /// let path = PathBuf::from("dice.png");
-/// let chunk_type = "RuSt".to_string();
-/// let msg = decode(path, chunk_type).unwrap();
+/// let msg = decode(&path, "RuSt").unwrap();
 /// assert_eq!(msg, "This is a secret message");
 /// ```
-pub fn decode(path: PathBuf, chunk_type: String) -> Result<String, Error> {
-    let png_file = open_png(&path)?;
+pub fn decode(path: &PathBuf, chunk_type: &str) -> Result<String, Error> {
+    let png_file = open_png(path)?;
 
-    let chunk = png_file.chunk_by_type(&chunk_type);
+    let chunk = png_file.chunk_by_type(chunk_type);
     if let Some(x) = chunk {
         Ok((x.data_as_string().map_err(|_| Error::StrConversion)?).to_string())
     } else {
@@ -140,15 +137,17 @@ pub fn decode(path: PathBuf, chunk_type: String) -> Result<String, Error> {
 /// use std::path::PathBuf;
 /// use pngme_lib::remove;
 /// let path = PathBuf::from("dice.png");
-/// let chunk_type = "RuSt".to_string();
-/// remove(path, chunk_type).unwrap();
+/// let chunk_type = "RuSt";
+/// remove(&path, chunk_type).unwrap();
 /// ```
-pub fn remove(path: PathBuf, chunk_type: String) -> Result<(), Error> {
-    let mut png_file = open_png(&path)?;
+pub fn remove(path: &PathBuf, chunk_type: &str) -> Result<(), Error> {
+    let mut png_file = open_png(path)?;
 
     png_file
         .remove_first_chunk(&chunk_type)
-        .map_err(|_| Error::ChunkNotFound { chunk_type })?;
+        .map_err(|_| Error::ChunkNotFound {
+            chunk_type: chunk_type.to_string(),
+        })?;
     write_png(path, png_file)?;
     Ok(())
 }
@@ -161,10 +160,10 @@ pub fn remove(path: PathBuf, chunk_type: String) -> Result<(), Error> {
 /// use std::path::PathBuf;
 /// use pngme_lib::print_chunks;
 /// let path = PathBuf::from("dice.png");
-/// print_chunks(path).unwrap();
+/// print_chunks(&path).unwrap();
 /// ```
-pub fn print_chunks(path: PathBuf) -> Result<(), Error> {
-    let png_file = open_png(&path)?;
+pub fn print_chunks(path: &PathBuf) -> Result<(), Error> {
+    let png_file = open_png(path)?;
 
     for chunk in png_file.chunks() {
         println!("{}", chunk);
