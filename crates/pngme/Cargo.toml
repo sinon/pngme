@@ -17,3 +17,10 @@ snafu = { version = "0.8.5" }
 [lib]
 name = "pngme_lib"
 path = "src/lib.rs"
+
+[dev-dependencies]
+divan = { version = "2.10.1", package = "codspeed-divan-compat" }
+
+[[bench]]
+name = "example"
+harness = false
