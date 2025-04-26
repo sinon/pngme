@@ -11,7 +11,7 @@ mod pngme_python {
 
     #[pyfunction]
     pub fn encode(path: PathBuf, chunk_type: String, message: String) -> PyResult<()> {
-        let result = png_encode(path, chunk_type, message);
+        let result = png_encode(&path, &chunk_type, message);
         match result {
             Ok(_) => Ok(()),
             Err(e) => match e {
@@ -33,7 +33,7 @@ mod pngme_python {
 
     #[pyfunction]
     pub fn decode(path: PathBuf, chunk_type: String) -> PyResult<String> {
-        let result = png_decode(path, chunk_type);
+        let result = png_decode(&path, &chunk_type);
         match result {
             Ok(msg) => Ok(msg),
             Err(e) => match e {
@@ -55,7 +55,7 @@ mod pngme_python {
 
     #[pyfunction]
     pub fn remove(path: PathBuf, chunk_type: String) -> PyResult<()> {
-        let result = png_remove(path, chunk_type);
+        let result = png_remove(&path, &chunk_type);
         match result {
             Ok(_) => Ok(()),
             Err(e) => match e {

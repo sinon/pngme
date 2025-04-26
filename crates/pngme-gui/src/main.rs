@@ -64,12 +64,12 @@ impl eframe::App for PngmeApp {
                 ui.horizontal(|ui| {
                     if ui.button("Decode").clicked() {
                         let path = PathBuf::from(picked_path.to_string());
-                        self.decoded_message = Some(decode(path, "ruSt".to_string()).unwrap());
+                        self.decoded_message = Some(decode(&path, "ruSt").unwrap());
                     }
 
                     if ui.button("Remove").clicked() {
                         let path = PathBuf::from(self.picked_path.as_ref().unwrap().to_string());
-                        let result = remove(path, "ruSt".to_string());
+                        let result = remove(&path, "ruSt");
                         if let Err(e) = result {
                             self.error_message = Some(format!("Error: {}", e));
                         }
@@ -80,7 +80,7 @@ impl eframe::App for PngmeApp {
                     ui.text_edit_singleline(&mut self.secret_message);
                     if ui.button("Encode").clicked() {
                         let path = PathBuf::from(self.picked_path.as_ref().unwrap().to_string());
-                        encode(path, "ruSt".to_string(), self.secret_message.to_string()).unwrap();
+                        encode(&path, "ruSt", self.secret_message.to_string()).unwrap();
                     }
                 });
             }
