@@ -1,0 +1,31 @@
+# Definitions of third-party libraries used for buck2 builds of rue
+#
+# Note: This file is **not** used by a regular Cargo build of rue
+
+[workspace]
+
+[package]
+# Pseudo-package whose dependencies are imported and buckified
+name = "third-party"
+version = "0.0.0"
+publish = false
+edition = "2024"
+
+# Do-nothing target to keep Cargo happy
+[[bin]]
+name = "top"
+path = "top/main.rs"
+
+# BEGIN: DEPENDENCIES
+
+[workspace.package]
+edition = "2024"
+version = "0.1.0"
+
+[dependencies]
+nom = "7.1.3"
+crc = "3.2.1"
+snafu = { version = "0.8.5" }
+clap = { version = "4.5.21", features = ["derive"] }
+
+# END: DEPENDENCIES
