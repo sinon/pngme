@@ -1,0 +1,12 @@
+rust_library(
+    name = "library",
+    crate = "pngme_lib",
+    srcs = glob(["src/**/*.rs"]),
+    crate_root = "src/lib.rs",
+    visibility = ["PUBLIC"],
+    deps = [
+        "//third-party/rust:snafu",
+        "//third-party/rust:nom",
+        "//third-party/rust:crc",
+    ],
+)
